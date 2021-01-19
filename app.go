@@ -1,31 +1,39 @@
 package minimin
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"sync"
 	"time"
 )
 
-// App app
-type App struct {
-	Project string `json:"project,omitempty" yaml:"project,omitempty"`
-	Name    string `json:"name" yaml:"name"`
-	Path    string `json:"path,omitempty" yaml:"path,omitempty"`
+func (a *App) appInfoPath() (path string) {
+	path = PathJoin(a.Path, InfoDir)
+	return
 }
 
-// AppList 每个工程目录下的appList
-type AppList map[string]AppInfo
+func (a *App) appConfigYamlPath() (path string) {
+	path = PathJoin(a.Path, InfoDir, ConfigYamlFile)
+	return
+}
 
-// AppInfo app 信息
-type AppInfo struct {
-	Name string `json:"name"`
+func (a *App) appConfigJsonPath() (path string) {
+	path = PathJoin(a.Path, InfoDir, ConfigJsonFile)
+	return
+}
+
+func (a *App) appRunLogJsonPath() (path string) {
+	path = PathJoin(a.Path, InfoDir, RunLogJsonFile)
+	return
 }
 
 func (a *App) getProjectPath() (path string, err error) {
 	var localPath = GetBasePath()
-	path = PathJoin(localPath, a.Project)
+	path = PathJoin(localPath, a.Project.Name)
 	_, err = os.Stat(path)
 	return
 }
@@ -34,6 +42,9 @@ func (a *App) getProjectPath() (path string, err error) {
 func (a *App) CancelApp(path string) (err error) {
 	path = PathJoin(path, InfoDir+"/"+AppListFile)
 	var content []byte
+	var littleLock = sync.Mutex{}
+	littleLock.Lock()
+	defer littleLock.Unlock()
 	content, err = ioutil.ReadFile(path)
 	if err != nil {
 		return
@@ -58,6 +69,9 @@ func (a *App) CancelApp(path string) (err error) {
 func (a *App) RegisterApp(path string) (err error) {
 	path = PathJoin(path, InfoDir+"/"+AppListFile)
 	var content []byte
+	var littleLock = sync.Mutex{}
+	littleLock.Lock()
+	defer littleLock.Unlock()
 	content, err = ioutil.ReadFile(path)
 	if err != nil {
 		return
@@ -75,21 +89,6 @@ func (a *App) RegisterApp(path string) (err error) {
 		return
 	}
 	err = ioutil.WriteFile(path, content, SimpleDirPerm)
-	return
-}
-
-func (a *App) appInfoPath() (path string) {
-	path = PathJoin(a.Path, InfoDir)
-	return
-}
-
-func (a *App) appConfigYamlPath() (path string) {
-	path = PathJoin(a.Path, InfoDir, ConfigYamlFile)
-	return
-}
-
-func (a *App) appConfigJsonPath() (path string) {
-	path = PathJoin(a.Path, InfoDir, ConfigJsonFile)
 	return
 }
 
@@ -166,12 +165,6 @@ func (a *App) GetConfigYaml() (mf *MinFile, err error) {
 	return
 }
 
-// AppAdminConfig app管理的设置
-type AppAdminConfig struct {
-	MaxStorageDays  int `json:"max_storage_days,omitempty"`
-	MaxStorageTimes int `json:"max_storage_times,omitempty"`
-}
-
 // LoadConfigJsonByFile 通过文件加载配置（管理的json文件）
 func (a *App) LoadConfigJsonByFile(path string) (err error) {
 	var aac AppAdminConfig
@@ -207,9 +200,62 @@ func (a *App) GetConfigJson() (aac *AppAdminConfig, err error) {
 	return
 }
 
+// Run 运行app
+func (a *App) Run() (plObj *DNA, err error) {
+	var l = sync.Mutex{}
+	var num int
+	l.Lock()
+	defer l.Unlock()
+	var content []byte
+	content, err = ioutil.ReadFile(a.appRunLogJsonPath())
+	if err != nil {
+		return
+	}
+	var rljList []RunLogJson
+	if err = json.Unmarshal(content, &rljList); err != nil {
+		return
+	}
+	num = len(rljList) + 1
+	plObj, err = a.NewProductionLine(num)
+	if err != nil {
+		return
+	}
+	rljList = append(rljList, RunLogJson{
+		Num:       num,
+		StartTime: sql.NullTime{Time: time.Now(), Valid: true},
+		Status:    Queue,
+	})
+	b, _ := json.Marshal(rljList)
+	err = ioutil.WriteFile(a.appRunLogJsonPath(), b, SimpleFilePerm)
+	if err != nil {
+		os.Remove(PathJoin(a.Path, strconv.Itoa(num)))
+	}
+	return
+}
+
+// NewProductionLine 新启动一天生产线
+func (a *App) NewProductionLine(num int) (pl *DNA, err error) {
+	var numStr = strconv.Itoa(num)
+	var thePLPath = PathJoin(a.Path, numStr)
+	if err = os.Mkdir(thePLPath, SimpleDirPerm); err != nil {
+		return nil, err
+	}
+	var content []byte
+	content, err = ioutil.ReadFile(PathJoin(a.Project.projectInfoPath(), ConfigYamlFile))
+	if err != nil {
+		return nil, err
+	}
+	err = ioutil.WriteFile(PathJoin(thePLPath, ConfigYamlFile), content, SimpleFilePerm)
+	if err != nil {
+		os.Remove(thePLPath)
+	}
+	return
+}
+
+// RunLogJson 运行记录的json记录文件
 type RunLogJson struct {
-	Num       int       `json:"num"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
-	Status    Status    `json:"status"`
+	Num       int          `json:"num"`
+	StartTime sql.NullTime `json:"start_time"`
+	EndTime   sql.NullTime `json:"end_time"`
+	Status    Status       `json:"status"`
 }

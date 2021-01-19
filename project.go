@@ -56,7 +56,7 @@ func (p *Project) Delete() (err error) {
 // NewApp 新建app
 func (p *Project) NewApp(name string) (a *App, err error) {
 	a = &App{
-		Project: p.Name,
+		Project: *p,
 		Name:    name,
 	}
 	if err = a.New(); err != nil {
@@ -83,7 +83,7 @@ func (p *Project) GetApp(name string) (a *App, err error) {
 		return nil, errors.New("the app not existed")
 	}
 	a = &App{
-		Project: p.Name,
+		Project: *p,
 		Name:    name,
 	}
 	a.Path = PathJoin(p.Path, a.Name)

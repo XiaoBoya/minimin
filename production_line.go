@@ -1,6 +1,6 @@
 package minimin
 
-// MP 最小的单位，ci/cd最小的执行单位
+// MP 最小的单位，CI/CD最小的执行单位
 type MP struct {
 	Name        string            `yaml:"name" json:"name"`
 	Description string            `yaml:"description,omitempty" json:"description,omitempty"`
@@ -12,7 +12,7 @@ type MP struct {
 	Status      string            `yaml:"-" json:"status,omitempty"`
 }
 
-// MPForWork 支线
+// MPForWork 支线或单点
 type MPForWork struct {
 	Single *MP
 	Multi  map[string][]MP
@@ -32,7 +32,7 @@ type GeneForWork struct {
 	MPs    []MPForWork `yaml:"MPs" json:"MPs"`
 	Ignore bool        `yaml:"ignore,omitempty" json:"ignore,omitempty"`
 	When   string      `yaml:"when,omitempty" json:"when,omitempty"`
-	Status string      `yaml:"status" json:"status"`
+	Status Status      `yaml:"status" json:"status"`
 }
 
 // MinFile 配置文件结构
@@ -44,6 +44,7 @@ type MinFile struct {
 
 // DNA 运行使用的最外层数据结构
 type DNA struct {
+	Num   int               `yaml:"-" json:"num"`
 	Env   map[string]string `yaml:"env" json:"env"`
 	Genes []GeneForWork     `yaml:"genes" json:"genes"`
 }
