@@ -8,6 +8,7 @@ const (
 	Queue   = "QUEUE"   // 队列中
 
 	SimpleFilePerm = 0666
+	SimpleDirPerm  = 0755
 	DangerPerm     = 0777
 
 	InfoDir = "info"

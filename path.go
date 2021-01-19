@@ -11,8 +11,8 @@ var (
 
 // InitStorage 初始化存储路径
 func InitStorage(path string) (err error) {
-	if PathNotExist(path) {
-		err = os.Mkdir(path, SimpleFilePerm)
+	if !PathExist(path) {
+		err = os.Mkdir(path, SimpleDirPerm)
 		if err == nil {
 			PATH = path
 		} else {
@@ -48,18 +48,6 @@ func PathExist(path string) (res bool) {
 	_, err = os.Stat(path)
 	switch err {
 	case nil:
-		return true
-	default:
-		return false
-	}
-}
-
-// PathNotExist 路径不存在
-func PathNotExist(path string) (res bool) {
-	var err error
-	_, err = os.Stat(path)
-	switch err {
-	case os.ErrNotExist:
 		return true
 	default:
 		return false

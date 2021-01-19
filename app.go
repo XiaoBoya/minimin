@@ -44,7 +44,7 @@ func (a App) CancelApp(path string) (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path, content, SimpleFilePerm)
+	err = ioutil.WriteFile(path, content, SimpleDirPerm)
 	return
 }
 
@@ -67,7 +67,7 @@ func (a *App) RegisterApp(path string) (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path, content, SimpleFilePerm)
+	err = ioutil.WriteFile(path, content, SimpleDirPerm)
 	return
 }
 
@@ -81,11 +81,11 @@ func (a *App) New() (err error) {
 	if PathExist(appPath) {
 		return os.ErrExist
 	}
-	if err = os.Mkdir(appPath, SimpleFilePerm); err != nil {
+	if err = os.Mkdir(appPath, SimpleDirPerm); err != nil {
 		return
 	}
 	var appInfoPath = PathJoin(appPath, InfoDir)
-	if err = os.Mkdir(appInfoPath, SimpleFilePerm); err != nil {
+	if err = os.Mkdir(appInfoPath, SimpleDirPerm); err != nil {
 		return
 	}
 	if err = a.RegisterApp(path); err != nil {
@@ -102,7 +102,7 @@ func (a *App) Delete() (err error) {
 		return
 	}
 	var appPath = PathJoin(path, a.Name)
-	if PathNotExist(appPath) {
+	if !PathExist(appPath) {
 		return os.ErrNotExist
 	}
 	if err = a.CancelApp(path); err != nil {
