@@ -9,7 +9,7 @@ type MP struct {
 	Params      map[string]string `yaml:"params,omitempty" json:"params,omitempty"`
 	Ignore      bool              `yaml:"ignore,omitempty" json:"ignore,omitempty"`
 	When        string            `yaml:"when,omitempty" json:"when,omitempty"`
-	Status      string            `yaml:"-" json:"status,omitempty"`
+	Status      Status            `yaml:"-" json:"status,omitempty"`
 }
 
 // MPForWork 支线或单点

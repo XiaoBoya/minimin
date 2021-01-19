@@ -233,7 +233,7 @@ func (a *App) Run() (plObj *DNA, err error) {
 	return
 }
 
-// NewProductionLine 新启动一天生产线
+// NewProductionLine 新启动一条生产线
 func (a *App) NewProductionLine(num int) (pl *DNA, err error) {
 	var numStr = strconv.Itoa(num)
 	var thePLPath = PathJoin(a.Path, numStr)
