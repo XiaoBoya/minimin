@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 // App app
@@ -87,6 +88,11 @@ func (a *App) appConfigYamlPath() (path string) {
 	return
 }
 
+func (a *App) appConfigJsonPath() (path string) {
+	path = PathJoin(a.Path, InfoDir, ConfigJsonFile)
+	return
+}
+
 // New 新建app
 func (a *App) New() (err error) {
 	var path string
@@ -152,4 +158,58 @@ func (a *App) LoadConfigYamlByByte(content []byte) (err error) {
 	}
 	err = ioutil.WriteFile(a.appConfigYamlPath(), content, SimpleFilePerm)
 	return
+}
+
+// GetConfigYaml 获取运行配置
+func (a *App) GetConfigYaml() (mf *MinFile, err error) {
+	mf, err = YamlLoad(a.appConfigYamlPath())
+	return
+}
+
+// AppAdminConfig app管理的设置
+type AppAdminConfig struct {
+	MaxStorageDays  int `json:"max_storage_days,omitempty"`
+	MaxStorageTimes int `json:"max_storage_times,omitempty"`
+}
+
+// LoadConfigJsonByFile 通过文件加载配置（管理的json文件）
+func (a *App) LoadConfigJsonByFile(path string) (err error) {
+	var aac AppAdminConfig
+	var content []byte
+	content, err = ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(content, &aac); err != nil {
+		return
+	}
+	err = ioutil.WriteFile(a.appConfigJsonPath(), content, SimpleFilePerm)
+	return
+}
+
+// LoadConfigJsonByFile 通过文件加载配置（管理的json文件）
+func (a *App) LoadConfigJsonByByte(content []byte) (err error) {
+	var aac AppAdminConfig
+	if err = json.Unmarshal(content, &aac); err != nil {
+		return
+	}
+	err = ioutil.WriteFile(a.appConfigJsonPath(), content, SimpleFilePerm)
+	return
+}
+
+// GetConfigJson 获取配置
+func (a *App) GetConfigJson() (aac *AppAdminConfig, err error) {
+	var content []byte
+	if content, err = ioutil.ReadFile(a.appConfigJsonPath()); err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(content, &aac)
+	return
+}
+
+type RunLogJson struct {
+	Num       int       `json:"num"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+	Status    Status    `json:"status"`
 }
