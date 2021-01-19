@@ -41,7 +41,7 @@ func (a *App) CancelApp(path string) (err error) {
 		return
 	}
 	if _, ok := al[a.Name]; !ok {
-		return errors.New("the app is not existed!")
+		return errors.New("the app is not existed")
 	}
 	delete(al, a.Name)
 	content, err = json.Marshal(al)
@@ -65,7 +65,7 @@ func (a *App) RegisterApp(path string) (err error) {
 		return
 	}
 	if _, ok := al[a.Name]; ok {
-		return errors.New("the app is existed!")
+		return errors.New("the app is existed")
 	}
 	al[a.Name] = AppInfo{Name: a.Name}
 	content, err = json.Marshal(al)
@@ -95,7 +95,7 @@ func (a *App) New() (err error) {
 		return
 	}
 	if err = a.RegisterApp(path); err != nil {
-		os.Remove(appPath)
+		_ = os.Remove(appPath)
 		return
 	}
 	return nil
@@ -116,7 +116,7 @@ func (a *App) Delete() (err error) {
 		return
 	}
 	if err = os.Remove(appPath); err != nil {
-		a.RegisterApp(path)
+		_ = a.RegisterApp(path)
 		return
 	}
 	return nil

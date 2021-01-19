@@ -3,7 +3,7 @@ package minimin
 const (
 	Success = "SUCCESS" // 成功
 	Fail    = "FAIL"    // 失败
-	Run     = "RUNING"  // 运行中
+	Run     = "RUNNING"  // 运行中
 	Init    = "INIT"    // 初始化
 	Queue   = "QUEUE"   // 队列中
 

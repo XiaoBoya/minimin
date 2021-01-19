@@ -1,6 +1,6 @@
 package minimin
 
-// MP 最小的单位，CICD最小的执行单位
+// MP 最小的单位，ci/cd最小的执行单位
 type MP struct {
 	Name        string            `yaml:"name" json:"name"`
 	Description string            `yaml:"description,omitempty" json:"description,omitempty"`
@@ -42,9 +42,8 @@ type MinFile struct {
 	Genes []Gene            `yaml:"genes" json:"genes"`
 }
 
-// DNA 运行使用的大数据结构
+// DNA 运行使用的最外层数据结构
 type DNA struct {
-	Name  string            `yaml:"name" json:"name"`
 	Env   map[string]string `yaml:"env" json:"env"`
 	Genes []GeneForWork     `yaml:"genes" json:"genes"`
 }
