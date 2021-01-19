@@ -36,10 +36,13 @@ func GetBasePath() string {
 }
 
 // PathJoin 路径拼接
-func PathJoin(path string, filename string) string {
-	filename = strings.Trim(filename, "/")
-	path = strings.TrimRight(path, "/")
-	return path + "/" + filename
+func PathJoin(path string, fileNameList ...string) string {
+	for _, filename := range fileNameList {
+		filename = strings.Trim(filename, "/")
+		path = strings.TrimRight(path, "/")
+		path = path + "/" + filename
+	}
+	return path
 }
 
 // PathExist 路径存在

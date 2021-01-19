@@ -11,6 +11,7 @@ import (
 type App struct {
 	Project string `json:"project,omitempty" yaml:"project,omitempty"`
 	Name    string `json:"name" yaml:"name"`
+	Path    string `json:"path,omitempty" yaml:"path,omitempty"`
 }
 
 // AppList 每个工程目录下的appList
@@ -76,6 +77,11 @@ func (a *App) RegisterApp(path string) (err error) {
 	return
 }
 
+func (a *App) appInfoPath() (path string) {
+	path = PathJoin(a.Path, InfoDir)
+	return
+}
+
 // New 新建app
 func (a *App) New() (err error) {
 	var path string
@@ -83,19 +89,19 @@ func (a *App) New() (err error) {
 	if err != nil {
 		return
 	}
-	var appPath = PathJoin(path, a.Name)
-	if PathExist(appPath) {
+	a.Path = PathJoin(path, a.Name)
+	if PathExist(a.Path) {
 		return os.ErrExist
 	}
-	if err = os.Mkdir(appPath, SimpleDirPerm); err != nil {
+	if err = os.Mkdir(a.Path, SimpleDirPerm); err != nil {
 		return
 	}
-	var appInfoPath = PathJoin(appPath, InfoDir)
+	var appInfoPath = a.appInfoPath()
 	if err = os.Mkdir(appInfoPath, SimpleDirPerm); err != nil {
 		return
 	}
 	if err = a.RegisterApp(path); err != nil {
-		_ = os.Remove(appPath)
+		_ = os.Remove(a.Path)
 		return
 	}
 	return nil
@@ -108,14 +114,13 @@ func (a *App) Delete() (err error) {
 	if err != nil {
 		return
 	}
-	var appPath = PathJoin(path, a.Name)
-	if !PathExist(appPath) {
+	if !PathExist(a.Path) {
 		return os.ErrNotExist
 	}
 	if err = a.CancelApp(path); err != nil {
 		return
 	}
-	if err = os.Remove(appPath); err != nil {
+	if err = os.Remove(a.Path); err != nil {
 		_ = a.RegisterApp(path)
 		return
 	}
