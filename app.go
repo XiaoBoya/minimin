@@ -7,13 +7,16 @@ import (
 	"os"
 )
 
+// App app
 type App struct {
 	Project string `json:"project,omitempty" yaml:"project,omitempty"`
 	Name    string `json:"name" yaml:"name"`
 }
 
+// AppList 每个工程目录下的appList
 type AppList map[string]AppInfo
 
+// AppInfo app 信息
 type AppInfo struct {
 	Name string `json:"name"`
 }
@@ -25,7 +28,8 @@ func (a *App) getProjectPath() (path string, err error) {
 	return
 }
 
-func (a App) CancelApp(path string) (err error) {
+// CancelApp 注销app
+func (a *App) CancelApp(path string) (err error) {
 	path = PathJoin(path, InfoDir+"/"+AppListFile)
 	var content []byte
 	content, err = ioutil.ReadFile(path)
@@ -48,6 +52,7 @@ func (a App) CancelApp(path string) (err error) {
 	return
 }
 
+// RegisterApp 注册app
 func (a *App) RegisterApp(path string) (err error) {
 	path = PathJoin(path, InfoDir+"/"+AppListFile)
 	var content []byte
@@ -71,6 +76,7 @@ func (a *App) RegisterApp(path string) (err error) {
 	return
 }
 
+// New 新建app
 func (a *App) New() (err error) {
 	var path string
 	path, err = a.getProjectPath()
@@ -95,6 +101,7 @@ func (a *App) New() (err error) {
 	return nil
 }
 
+// Delete 删除app
 func (a *App) Delete() (err error) {
 	var path string
 	path, err = a.getProjectPath()

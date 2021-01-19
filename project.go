@@ -5,10 +5,12 @@ import (
 	"os"
 )
 
+// Project 工程
 type Project struct {
 	Name string `json:"name" yaml:"name"`
 }
 
+// New 新建工程
 func (p *Project) New() (err error) {
 	var localPath = GetBasePath()
 	var path = PathJoin(localPath, p.Name)
@@ -27,6 +29,7 @@ func (p *Project) New() (err error) {
 	return nil
 }
 
+// Delete 删除工程
 func (p *Project) Delete() (err error) {
 	var localPath = GetBasePath()
 	var path = PathJoin(localPath, p.Name)
