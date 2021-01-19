@@ -82,6 +82,11 @@ func (a *App) appInfoPath() (path string) {
 	return
 }
 
+func (a *App) appConfigYamlPath() (path string) {
+	path = PathJoin(a.Path, InfoDir, ConfigYamlFile)
+	return
+}
+
 // New 新建app
 func (a *App) New() (err error) {
 	var path string
@@ -125,4 +130,26 @@ func (a *App) Delete() (err error) {
 		return
 	}
 	return nil
+}
+
+// LoadConfigYamlByFile 通过文件加载配置（CI/CD运行使用的文件）
+func (a *App) LoadConfigYamlByFile(path string) (err error) {
+	if _, err = YamlLoad(path); err != nil {
+		return
+	}
+	var content []byte
+	if content, err = ioutil.ReadFile(path); err != nil {
+		return
+	}
+	err = ioutil.WriteFile(a.appConfigYamlPath(), content, SimpleFilePerm)
+	return
+}
+
+// LoadConfigYamlByByte 通过内容加载配置（CI/CD运行使用的文件）
+func (a *App) LoadConfigYamlByByte(content []byte) (err error) {
+	if _, err = YamlLoadByByte(content); err != nil {
+		return
+	}
+	err = ioutil.WriteFile(a.appConfigYamlPath(), content, SimpleFilePerm)
+	return
 }
