@@ -1,50 +1,16 @@
 package minimin
 
-// MP 最小的单位，CI/CD最小的执行单位
-type MP struct {
-	Name        string            `yaml:"name" json:"name"`
-	Description string            `yaml:"description,omitempty" json:"description,omitempty"`
-	AminoAcid   string            `yaml:"amino_acid" json:"amino_acid"`
-	Chain       string            `yaml:"chain,omitempty" json:"chain,omitempty"`
-	Params      map[string]string `yaml:"params,omitempty" json:"params,omitempty"`
-	Ignore      bool              `yaml:"ignore,omitempty" json:"ignore,omitempty"`
-	When        string            `yaml:"when,omitempty" json:"when,omitempty"`
-	Status      Status            `yaml:"-" json:"status,omitempty"`
-}
-
-// MPForWork 支线或单点
-type MPForWork struct {
-	Single *MP
-	Multi  map[string][]MP
-}
-
-// Gene （基因）解析文件产生的对应顺序
-type Gene struct {
-	Name   string `yaml:"name" json:"name"`
-	MPs    []MP   `yaml:"MPs" json:"MPs"`
-	Ignore bool   `yaml:"ignore,omitempty" json:"ignore,omitempty"`
-	When   string `yaml:"when,omitempty" json:"when,omitempty"`
-}
-
-// GeneForWork （基因）实际运行使用的阶段级别的数据结构
-type GeneForWork struct {
-	Name   string      `yaml:"name" json:"name"`
-	MPs    []MPForWork `yaml:"MPs" json:"MPs"`
-	Ignore bool        `yaml:"ignore,omitempty" json:"ignore,omitempty"`
-	When   string      `yaml:"when,omitempty" json:"when,omitempty"`
-	Status Status      `yaml:"status" json:"status"`
-}
-
-// MinFile 配置文件结构
-type MinFile struct {
-	Name  string            `yaml:"name" json:"name"`
-	Env   map[string]string `yaml:"env" json:"env"`
-	Genes []Gene            `yaml:"genes" json:"genes"`
-}
-
-// DNA 运行使用的最外层数据结构
-type DNA struct {
-	Num   int               `yaml:"-" json:"num"`
-	Env   map[string]string `yaml:"env" json:"env"`
-	Genes []GeneForWork     `yaml:"genes" json:"genes"`
+// HandleMinFile 配置文件转换到运行的结构体
+func (d *DNA) HandleMinFile(file MinFile) (err error) {
+	d.Env = file.Env
+	for _, geneObj := range file.Genes {
+		var newGeneObj GeneForWork
+		newGeneObj.Status = Queue
+		newGeneObj.Name = geneObj.Name
+		newGeneObj.Ignore = geneObj.Ignore
+		newGeneObj.When = geneObj.When
+		newGeneObj.MPs = HandleMPs(geneObj.MPs)
+		d.Genes = append(d.Genes, newGeneObj)
+	}
+	return err
 }

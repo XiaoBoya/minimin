@@ -39,7 +39,7 @@ func (p *Project) New() (err error) {
 		return
 	}
 	var appConfPath = PathJoin(path, AppListFile)
-	err = ioutil.WriteFile(appConfPath, nil, SimpleFilePerm)
+	err = ioutil.WriteFile(appConfPath, []byte("{}"), SimpleFilePerm)
 	return nil
 }
 
