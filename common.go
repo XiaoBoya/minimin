@@ -13,7 +13,8 @@ const (
 	SimpleDirPerm  = 0755 // 普通文件夹权限
 	DangerPerm     = 0777 // 危险权限
 
-	AppListFile    = "apps.json"    // app列表存储文件名称
+	AppListFile    = "apps.json" // app列表存储文件名称
+	EnvJsonFile    = ".env.json"
 	ConfigYamlFile = "config.yaml"  // yaml配置文件名
 	ConfigJsonFile = "config.json"  // json配置文件夹名
 	InfoDir        = "info"         // 信息文件夹名

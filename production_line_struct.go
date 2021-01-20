@@ -44,7 +44,8 @@ type MinFile struct {
 
 // DNA 运行使用的最外层数据结构
 type DNA struct {
-	Num   int               `yaml:"-" json:"num"`
+	Num   string            `yaml:"-" json:"num"`
+	Path  string            `yaml:"-" json:"path"`
 	Env   map[string]string `yaml:"env" json:"env"`
 	Genes []GeneForWork     `yaml:"genes" json:"genes"`
 }

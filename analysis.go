@@ -56,19 +56,3 @@ func HandleMPs(MPList []MP) (MPB []MPForWork) {
 	}
 	return
 }
-
-// HandleMinFile 配置文件转换到运行的结构体
-func HandleMinFile(file MinFile) (dna *DNA, err error) {
-	var dnaObj DNA
-	dnaObj.Env = file.Env
-	for _, geneObj := range file.Genes {
-		var newGeneObj GeneForWork
-		newGeneObj.Status = Queue
-		newGeneObj.Name = geneObj.Name
-		newGeneObj.Ignore = geneObj.Ignore
-		newGeneObj.When = geneObj.When
-		newGeneObj.MPs = HandleMPs(geneObj.MPs)
-		dnaObj.Genes = append(dnaObj.Genes, newGeneObj)
-	}
-	return &dnaObj, err
-}

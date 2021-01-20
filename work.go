@@ -2,9 +2,7 @@ package minimin
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -69,56 +67,6 @@ func ListSynthesis(list []MP, cellSpace string) (err error) {
 			} else {
 				log.Fatalln(err.Error())
 				return
-			}
-		}
-	}
-	return
-}
-
-func Work(content []byte) (err error) {
-	var af *MinFile
-	af, err = YamlLoadByByte(content)
-	if err != nil {
-		return
-	}
-	var dnaObj *DNA
-	dnaObj, err = HandleMinFile(*af)
-	if err != nil {
-		return
-	}
-
-	// create cell space
-	var cellSpace = "cell/" + af.Name
-	err = os.Mkdir(cellSpace, 0777)
-	if err != nil {
-		return
-	}
-
-	// write env file
-	var b []byte
-	b, _ = json.Marshal(af.Env)
-	err = ioutil.WriteFile(cellSpace+"/env.json", b, 0777)
-	if err != nil {
-		return
-	}
-
-	// translate genes
-	for _, geneObj := range dnaObj.Genes {
-		for _, mpObj := range geneObj.MPs {
-			switch mpObj.Multi {
-			case nil:
-				if _, err = mpObj.Single.Synthesis(cellSpace); err != nil {
-					if mpObj.Single.Ignore {
-						log.Println(err.Error())
-					} else {
-						log.Fatalln(err.Error())
-						return
-					}
-				}
-			default:
-				for _, mpChildList := range mpObj.Multi {
-					go ListSynthesis(mpChildList, cellSpace)
-				}
 			}
 		}
 	}

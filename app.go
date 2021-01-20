@@ -249,6 +249,7 @@ func (a *App) NewProductionLine(num int) (pl *DNA, err error) {
 	if err != nil {
 		os.Remove(thePLPath)
 	}
+	pl = &DNA{Num: numStr, Path: thePLPath}
 	return
 }
 
