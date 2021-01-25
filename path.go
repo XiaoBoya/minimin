@@ -2,7 +2,6 @@ package minimin
 
 import (
 	"os"
-	"strings"
 )
 
 var (
@@ -33,16 +32,6 @@ func GetBasePath() string {
 	default:
 		return PATH
 	}
-}
-
-// PathJoin 路径拼接
-func PathJoin(path string, fileNameList ...string) string {
-	for _, filename := range fileNameList {
-		filename = strings.Trim(filename, "/")
-		path = strings.TrimRight(path, "/")
-		path = path + "/" + filename
-	}
-	return path
 }
 
 // PathExist 路径存在

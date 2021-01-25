@@ -6,41 +6,42 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
 )
 
 func (a *App) appInfoPath() (path string) {
-	path = PathJoin(a.Path, InfoDir)
+	path = filepath.Join(a.Path, InfoDir)
 	return
 }
 
 func (a *App) appConfigYamlPath() (path string) {
-	path = PathJoin(a.Path, InfoDir, ConfigYamlFile)
+	path = filepath.Join(a.Path, InfoDir, ConfigYamlFile)
 	return
 }
 
 func (a *App) appConfigJsonPath() (path string) {
-	path = PathJoin(a.Path, InfoDir, ConfigJsonFile)
+	path = filepath.Join(a.Path, InfoDir, ConfigJsonFile)
 	return
 }
 
 func (a *App) appRunLogJsonPath() (path string) {
-	path = PathJoin(a.Path, InfoDir, RunLogJsonFile)
+	path = filepath.Join(a.Path, InfoDir, RunLogJsonFile)
 	return
 }
 
 func (a *App) getProjectPath() (path string, err error) {
 	var localPath = GetBasePath()
-	path = PathJoin(localPath, a.Project.Name)
+	path = filepath.Join(localPath, a.Project.Name)
 	_, err = os.Stat(path)
 	return
 }
 
 // CancelApp 注销app
 func (a *App) CancelApp(path string) (err error) {
-	path = PathJoin(path, InfoDir+"/"+AppListFile)
+	path = filepath.Join(path, InfoDir+"/"+AppListFile)
 	var content []byte
 	var littleLock = sync.Mutex{}
 	littleLock.Lock()
@@ -67,7 +68,7 @@ func (a *App) CancelApp(path string) (err error) {
 
 // RegisterApp 注册app
 func (a *App) RegisterApp(path string) (err error) {
-	path = PathJoin(path, InfoDir+"/"+AppListFile)
+	path = filepath.Join(path, InfoDir+"/"+AppListFile)
 	var content []byte
 	var littleLock = sync.Mutex{}
 	littleLock.Lock()
@@ -99,7 +100,7 @@ func (a *App) New() (err error) {
 	if err != nil {
 		return
 	}
-	a.Path = PathJoin(path, a.Name)
+	a.Path = filepath.Join(path, a.Name)
 	if PathExist(a.Path) {
 		return os.ErrExist
 	}
@@ -228,7 +229,7 @@ func (a *App) Run() (plObj *DNA, err error) {
 	b, _ := json.Marshal(rljList)
 	err = ioutil.WriteFile(a.appRunLogJsonPath(), b, SimpleFilePerm)
 	if err != nil {
-		os.Remove(PathJoin(a.Path, strconv.Itoa(num)))
+		os.Remove(filepath.Join(a.Path, strconv.Itoa(num)))
 	}
 	return
 }
@@ -236,16 +237,16 @@ func (a *App) Run() (plObj *DNA, err error) {
 // NewProductionLine 新启动一条生产线
 func (a *App) NewProductionLine(num int) (pl *DNA, err error) {
 	var numStr = strconv.Itoa(num)
-	var thePLPath = PathJoin(a.Path, numStr)
+	var thePLPath = filepath.Join(a.Path, numStr)
 	if err = os.Mkdir(thePLPath, SimpleDirPerm); err != nil {
 		return nil, err
 	}
 	var content []byte
-	content, err = ioutil.ReadFile(PathJoin(a.Project.projectInfoPath(), ConfigYamlFile))
+	content, err = ioutil.ReadFile(filepath.Join(a.Project.projectInfoPath(), ConfigYamlFile))
 	if err != nil {
 		return nil, err
 	}
-	err = ioutil.WriteFile(PathJoin(thePLPath, ConfigYamlFile), content, SimpleFilePerm)
+	err = ioutil.WriteFile(filepath.Join(thePLPath, ConfigYamlFile), content, SimpleFilePerm)
 	if err != nil {
 		os.Remove(thePLPath)
 	}

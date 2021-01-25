@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 // Project 工程
@@ -14,14 +15,14 @@ type Project struct {
 }
 
 func (p *Project) projectInfoPath() (path string) {
-	path = PathJoin(p.Path, InfoDir)
+	path = filepath.Join(p.Path, InfoDir)
 	return
 }
 
 func (p *Project) GetPath() {
 	if p.Path == "" {
 		var localPath = GetBasePath()
-		p.Path = PathJoin(localPath, p.Name)
+		p.Path = filepath.Join(localPath, p.Name)
 	}
 }
 
@@ -38,7 +39,7 @@ func (p *Project) New() (err error) {
 	if err = os.Mkdir(path, SimpleDirPerm); err != nil {
 		return
 	}
-	var appConfPath = PathJoin(path, AppListFile)
+	var appConfPath = filepath.Join(path, AppListFile)
 	err = ioutil.WriteFile(appConfPath, []byte("{}"), SimpleFilePerm)
 	return nil
 }
@@ -69,7 +70,7 @@ func (p *Project) NewApp(name string) (a *App, err error) {
 func (p *Project) GetApp(name string) (a *App, err error) {
 	p.GetPath()
 	var path = p.projectInfoPath()
-	var infoPath = PathJoin(path, InfoDir, AppListFile)
+	var infoPath = filepath.Join(path, InfoDir, AppListFile)
 	var content []byte
 	content, err = ioutil.ReadFile(infoPath)
 	if err != nil {
@@ -86,6 +87,6 @@ func (p *Project) GetApp(name string) (a *App, err error) {
 		Project: *p,
 		Name:    name,
 	}
-	a.Path = PathJoin(p.Path, a.Name)
+	a.Path = filepath.Join(p.Path, a.Name)
 	return
 }

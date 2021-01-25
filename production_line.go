@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
 
 func (d *DNA) LoadMinFile() (minFile *MinFile, err error) {
 	var content []byte
-	content, err = ioutil.ReadFile(PathJoin(d.Path, EnvJsonFile))
+	content, err = ioutil.ReadFile(filepath.Join(d.Path, EnvJsonFile))
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +26,7 @@ func (d *DNA) HandleMinFile(file MinFile) (err error) {
 	if envB, err = json.Marshal(file.Env); err != nil {
 		return
 	}
-	if err = ioutil.WriteFile(PathJoin(d.Path, EnvJsonFile), envB, SimpleFilePerm); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(d.Path, EnvJsonFile), envB, SimpleFilePerm); err != nil {
 		return
 	}
 	for _, geneObj := range file.Genes {
